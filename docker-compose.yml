@@ -1,0 +1,74 @@
+version: '3.6'
+services:
+  accounts:
+    image: java:8-alpine
+    command: sh -c "apk update && apk add curl && java -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
+    healthcheck:
+      test: curl -f http://localhost:8080/actuator/health
+      interval: 5s
+      timeout: 2s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - database
+    volumes:
+      - type: bind
+        source: ./accounts/build/libs
+        target: /var/service
+    ports:
+      - target: 8080
+        published: 9090
+    networks:
+      dev:
+        aliases:
+          - accounts
+  transactions:
+    image: java:8-alpine
+    command: sh -c "apk update && apk add curl && java -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
+    healthcheck:
+      test: curl -f http://localhost:8080/actuator/health
+      interval: 5s
+      timeout: 2s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - database
+    volumes:
+      - type: bind
+        source: ./transactions/build/libs
+        target: /var/service
+    ports:
+      - target: 8080
+        published: 9091
+    networks:
+      dev:
+        aliases:
+          - transactions
+  database:
+    image: postgres:10.4-alpine
+    environment:
+      POSTGRES_PASSWORD: "dev"
+    ports:
+      - target: 5432
+        published: 5432
+    networks:
+      dev:
+        aliases:
+          - database
+  setup:
+    image: alpine
+    healthcheck:
+      test: PGPASSWORD=dev psql -h database -U postgres -c 'select 1;'
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      - database
+    networks:
+      dev:
+        aliases:
+          - setup
+    command: sh -c "apk update && apk add postgresql-client && PGPASSWORD=dev psql -h database -U postgres -c 'create database pismo;'"
+
+networks:
+  dev:
