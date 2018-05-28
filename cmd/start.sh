@@ -1,5 +1,6 @@
 #!/bin/bash
 
+GREEN='\033[0;32m'
 BASEDIR=$(dirname "$0")
 EXECDIR=$PWD
 
@@ -42,4 +43,4 @@ do
     SERVICESUP=$(docker ps | grep healthy | grep pismo | wc -l)
 done
 
-echo "Dev environment up"
+printf "\n${GREEN}Dev up"
