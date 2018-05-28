@@ -16,6 +16,10 @@ public class Account {
     public Limit(BigDecimal amount) {
       this.amount = amount;
     }
+
+    public BigDecimal getAmount() {
+      return amount;
+    }
   }
 
   @JsonProperty("available_credit_limit")
@@ -33,12 +37,22 @@ public class Account {
     return new Account(Limit.ZERO, Limit.ZERO);
   }
 
-  public static Optional<Account> fromEntity(Optional<com.pismo.accounts.data.entities.Account> accountEntity){
-    return accountEntity.map(acc -> {
-      Limit crLimit = new Limit(acc.getCreditLimt());
-      Limit drawLimit = new Limit(acc.getWithdrawalLimit());
+  public static Optional<Account> fromEntityOpt(Optional<com.pismo.accounts.data.entities.Account> accountEntity){
+    return accountEntity.map(Account::fromEntity);
+  }
 
-      return new Account(crLimit, drawLimit);
-    });
+  public static Account fromEntity(com.pismo.accounts.data.entities.Account accountEntity){
+    Limit crLimit = new Limit(accountEntity.getCreditLimt());
+    Limit drawLimit = new Limit(accountEntity.getWithdrawalLimit());
+
+    return new Account(crLimit, drawLimit);
+  }
+
+  public Limit getCreditLimit() {
+    return creditLimit;
+  }
+
+  public Limit getWithdrawalLimit() {
+    return withdrawalLimit;
   }
 }

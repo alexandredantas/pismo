@@ -42,12 +42,27 @@ public class Account {
     return acc;
   }
 
+  private void setCreditLimt(BigDecimal creditLimt) {
+    BigDecimal newLimit = this.creditLimt.add(creditLimt);
+
+    if (newLimit.doubleValue() >= 0) {
+      this.creditLimt = creditLimt;
+    }
+  }
+
+  private void setWithdrawalLimit(BigDecimal withdrawalLimit) {
+    BigDecimal newDraw = this.withdrawalLimit.add(withdrawalLimit);
+
+    if (newDraw.doubleValue() >= 0) {
+      this.withdrawalLimit = withdrawalLimit;
+    }
+  }
+
   public Account copy(BigDecimal newCreditLimit, BigDecimal newWithdrawalLimit){
     Account newAccount = new Account();
-
     newAccount.id = this.id;
-    newAccount.creditLimt = newCreditLimit;
-    newAccount.withdrawalLimit = newWithdrawalLimit;
+    newAccount.setCreditLimt(newCreditLimit);
+    newAccount.setWithdrawalLimit(newWithdrawalLimit);
 
     return newAccount;
   }
