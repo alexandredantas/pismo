@@ -11,6 +11,7 @@ services:
       start_period: 10s
     depends_on:
       - database
+      - redis
     volumes:
       - type: bind
         source: ./accounts/build/libs
@@ -33,6 +34,7 @@ services:
       start_period: 10s
     depends_on:
       - database
+      - redis
     volumes:
       - type: bind
         source: ./transactions/build/libs
@@ -55,6 +57,12 @@ services:
       dev:
         aliases:
           - database
+  redis:
+    image: redis
+    networks:
+      dev:
+        aliases:
+          - redis
   setup:
     image: alpine
     healthcheck:
