@@ -1,12 +1,27 @@
 package com.pismo.transactions;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -14,9 +29,31 @@ import org.springframework.test.context.junit4.SpringRunner;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL)
 public class TransactionsApplicationTests {
 
+  private MediaType JSON_TYPE = new MediaType(MediaType.APPLICATION_JSON.getType(),
+      MediaType.APPLICATION_JSON.getSubtype(),
+      Charset.forName("utf8"));
 
-	@Test
-	public void contextLoads() {
-	}
+  private MockMvc mockMvc;
 
+  @Autowired
+  private WebApplicationContext webApplicationContext;
+
+  @Autowired
+  private ObjectMapper mapper;
+
+  @Before
+  public void setup() throws Exception {
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+  }
+
+  @Test
+  public void testNewTransaction() throws Exception {
+
+    TransactionRequest request = new TransactionRequest(1L, TransactionRequest.OpType.A_VISTA, BigDecimal.ONE);
+
+    mockMvc.perform(post("/v1/transactions")
+        .contentType(JSON_TYPE)
+        .content(mapper.writeValueAsString(request)))
+        .andExpect(status().isOk());
+  }
 }
