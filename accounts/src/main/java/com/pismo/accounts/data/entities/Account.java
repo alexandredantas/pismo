@@ -1,6 +1,7 @@
 package com.pismo.accounts.data.entities;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "accounts", schema = "accounts")
 public class Account {
+
+  private static final MathContext DEFAULT_MATH_CONTEXT = new MathContext(3);
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,8 +67,8 @@ public class Account {
   public Account copy(BigDecimal newCreditLimit, BigDecimal newWithdrawalLimit){
     Account newAccount = new Account();
     newAccount.id = this.id;
-    newAccount.creditLimit = this.creditLimit;
-    newAccount.withdrawalLimit = this.withdrawalLimit;
+    newAccount.creditLimit = new BigDecimal(this.creditLimit.doubleValue(), DEFAULT_MATH_CONTEXT);
+    newAccount.withdrawalLimit = new BigDecimal(this.withdrawalLimit.doubleValue(), DEFAULT_MATH_CONTEXT);
 
     newAccount.setCreditLimit(newCreditLimit);
     newAccount.setWithdrawalLimit(newWithdrawalLimit);

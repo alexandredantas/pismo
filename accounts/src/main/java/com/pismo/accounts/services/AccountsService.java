@@ -29,10 +29,7 @@ public class AccountsService {
 
   public Optional<Account> updateLimits(Account newLimits){
     try {
-      return accountsRepository
-          .findById(newLimits.getId())
-          .map(existingAcc -> existingAcc.copy(newLimits.getCreditLimit(), newLimits.getWithdrawalLimit()))
-          .map(accountsRepository::saveAndFlush);
+      return Optional.of(accountsRepository.saveAndFlush(newLimits));
     } catch(Exception e){
       LOGGER.error("Error updating account limits for account={}", newLimits.getId(), e);
       return Optional.empty();

@@ -117,7 +117,7 @@ public class AccountsTests {
 
   @Test
   public void testInvalidLimits() throws Exception {
-    Account newAccount = accountsRepository.save(Account.empty().copy(BigDecimal.valueOf(10.0), BigDecimal.valueOf(10.0)));
+    Account newAccount = accountsRepository.save(Account.empty().copy(BigDecimal.valueOf(10.1), BigDecimal.valueOf(10.1)));
     com.pismo.accounts.endpoints.v1.dto.Account newLimits = com.pismo.accounts.endpoints.v1.dto.Account.withValues(BigDecimal.valueOf(-100.0), BigDecimal.valueOf(-100.0));
 
     mockMvc
@@ -125,10 +125,10 @@ public class AccountsTests {
             .accept(JSON_TYPE)
             .contentType(JSON_TYPE)
             .content(mapper.writeValueAsString(newLimits)))
-        .andExpect(jsonPath("$.previous_limits.available_credit_limit.amount", is(10.0)))
-        .andExpect(jsonPath("$.previous_limits.available_withdrawal_limit.amount", is(10.0)))
-        .andExpect(jsonPath("$.new_limits.available_credit_limit.amount", is(10.0)))
-        .andExpect(jsonPath("$.new_limits.available_withdrawal_limit.amount", is(10.0)));
+        .andExpect(jsonPath("$.previous_limits.available_credit_limit.amount", is(10.1)))
+        .andExpect(jsonPath("$.previous_limits.available_withdrawal_limit.amount", is(10.1)))
+        .andExpect(jsonPath("$.new_limits.available_credit_limit.amount", is(10.1)))
+        .andExpect(jsonPath("$.new_limits.available_withdrawal_limit.amount", is(10.1)));
   }
 
 }
