@@ -31,7 +31,7 @@ public class AccountsService {
     try {
       return accountsRepository
           .findById(newLimits.getId())
-          .map(existingAcc -> existingAcc.copy(newLimits.getCreditLimt(), newLimits.getWithdrawalLimit()))
+          .map(existingAcc -> existingAcc.copy(newLimits.getCreditLimit(), newLimits.getWithdrawalLimit()))
           .map(accountsRepository::saveAndFlush);
     } catch(Exception e){
       LOGGER.error("Error updating account limits for account={}", newLimits.getId(), e);

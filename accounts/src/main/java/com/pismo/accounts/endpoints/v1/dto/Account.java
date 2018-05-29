@@ -1,9 +1,9 @@
 package com.pismo.accounts.endpoints.v1.dto;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 public class Account {
 
@@ -11,7 +11,10 @@ public class Account {
 
     private static final Limit ZERO = new Limit(BigDecimal.ZERO);
 
-    private final BigDecimal amount;
+    private BigDecimal amount;
+
+    public Limit() {
+    }
 
     public Limit(BigDecimal amount) {
       this.amount = amount;
@@ -23,10 +26,13 @@ public class Account {
   }
 
   @JsonProperty("available_credit_limit")
-  private final Limit creditLimit;
+  private Limit creditLimit;
 
   @JsonProperty("available_withdrawal_limit")
-  private final Limit withdrawalLimit;
+  private Limit withdrawalLimit;
+
+  public Account() {
+  }
 
   private Account(Limit creditLimit, Limit withdrawalLimit){
     this.creditLimit = creditLimit;
@@ -37,15 +43,15 @@ public class Account {
     return new Account(Limit.ZERO, Limit.ZERO);
   }
 
-  public static Optional<Account> fromEntityOpt(Optional<com.pismo.accounts.data.entities.Account> accountEntity){
-    return accountEntity.map(Account::fromEntity);
-  }
-
   public static Account fromEntity(com.pismo.accounts.data.entities.Account accountEntity){
-    Limit crLimit = new Limit(accountEntity.getCreditLimt());
+    Limit crLimit = new Limit(accountEntity.getCreditLimit());
     Limit drawLimit = new Limit(accountEntity.getWithdrawalLimit());
 
     return new Account(crLimit, drawLimit);
+  }
+
+  public static Account withValues(BigDecimal creditLimit, BigDecimal withdrawalLimit){
+    return new Account(new Limit(creditLimit), new Limit(withdrawalLimit));
   }
 
   public Limit getCreditLimit() {

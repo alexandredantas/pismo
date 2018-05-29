@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -13,21 +14,26 @@ import javax.persistence.Table;
 public class Account {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(name = "credit_limit")
-  private BigDecimal creditLimt;
+  private BigDecimal creditLimit;
 
   @Column(name = "withdrawal_limit")
   private BigDecimal withdrawalLimit;
+
+  private Account() {
+    this.creditLimit = BigDecimal.ZERO;
+    this.withdrawalLimit = BigDecimal.ZERO;
+  }
 
   public Long getId() {
     return id;
   }
 
-  public BigDecimal getCreditLimt() {
-    return creditLimt;
+  public BigDecimal getCreditLimit() {
+    return creditLimit;
   }
 
   public BigDecimal getWithdrawalLimit() {
@@ -35,18 +41,14 @@ public class Account {
   }
 
   public static Account empty(){
-    Account acc = new Account();
-    acc.creditLimt = BigDecimal.ZERO;
-    acc.withdrawalLimit = BigDecimal.ZERO;
-
-    return acc;
+    return new Account();
   }
 
-  private void setCreditLimt(BigDecimal creditLimt) {
-    BigDecimal newLimit = this.creditLimt.add(creditLimt);
+  private void setCreditLimit(BigDecimal creditLimit) {
+    BigDecimal newLimit = this.creditLimit.add(creditLimit);
 
     if (newLimit.doubleValue() >= 0) {
-      this.creditLimt = creditLimt;
+      this.creditLimit = creditLimit;
     }
   }
 
@@ -58,10 +60,14 @@ public class Account {
     }
   }
 
+  //How I miss you, Scala case class copy :(
   public Account copy(BigDecimal newCreditLimit, BigDecimal newWithdrawalLimit){
     Account newAccount = new Account();
     newAccount.id = this.id;
-    newAccount.setCreditLimt(newCreditLimit);
+    newAccount.creditLimit = this.creditLimit;
+    newAccount.withdrawalLimit = this.withdrawalLimit;
+
+    newAccount.setCreditLimit(newCreditLimit);
     newAccount.setWithdrawalLimit(newWithdrawalLimit);
 
     return newAccount;

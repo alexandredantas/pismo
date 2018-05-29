@@ -1,7 +1,7 @@
 package com.pismo.accounts.endpoints.v1.responses;
 
 public class AccountCreateResponse {
-  private final Long id;
+  private Long id;
 
   public AccountCreateResponse(Long id){
     this.id = id;
@@ -9,5 +9,9 @@ public class AccountCreateResponse {
 
   public static AccountCreateResponse empty(){
     return new AccountCreateResponse(null);
+  }
+
+  public Long getId() {
+    return id;
   }
 }

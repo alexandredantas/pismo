@@ -3,7 +3,6 @@ package com.pismo.accounts.endpoints.v1;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class AccountsController {
 
   @RequestMapping(method = RequestMethod.POST)
   @ResponseBody
-  public AccountCreateResponse createAccount(){
+  public AccountCreateResponse createAccount() {
     return accountsService
         .create()
         .map(acc -> new AccountCreateResponse(acc.getId()))
@@ -37,23 +36,32 @@ public class AccountsController {
 
   @RequestMapping(path = "/{accountId}", method = RequestMethod.PATCH)
   @ResponseBody
-  public ChangeLimitResponse changeLimits(@PathVariable("accountId") Long accountId, @RequestBody Account changeLimit){
+  public ChangeLimitResponse changeLimits(@PathVariable("accountId") Long accountId, @RequestBody Account changeLimit) {
     return accountsService
         .findById(accountId)
-        .map(found -> Pair.of(found, accountsService.updateLimits(found.copy(changeLimit.getCreditLimit().getAmount(), changeLimit.getWithdrawalLimit().getAmount()))))
-        .map(tuple -> new ChangeLimitResponse(Account.fromEntity(tuple.getLeft()), Account.fromEntityOpt(tuple.getRight())))
+        .map(found -> Pair.of(Account.fromEntity(found), accountsService
+            .updateLimits(found.copy(changeLimit.getCreditLimit().getAmount(), changeLimit.getWithdrawalLimit().getAmount()))
+            .map(Account::fromEntity)
+            .orElse(Account.fromEntity(found))))
+        .map(tuple -> new ChangeLimitResponse(tuple.getLeft(), tuple.getRight()))
         .orElseGet(ChangeLimitResponse::empty);
   }
 
   @RequestMapping(path = "/{accountId}/limits", method = RequestMethod.GET)
   @ResponseBody
-  public Optional<Account> accountLimits(@PathVariable("accountId") Long accountId){
-    return accountsService.findById(accountId).map(Account::fromEntity);
+  public Optional<Account> accountLimits(@PathVariable("accountId") Long accountId) {
+    return accountsService
+        .findById(accountId)
+        .map(Account::fromEntity);
   }
 
   @RequestMapping(path = "/limits", method = RequestMethod.GET)
   @ResponseBody
-  public List<Account> allLimits(){
-    return accountsService.retrieveAll().stream().map(Account::fromEntity).collect(Collectors.toList());
+  public List<Account> allLimits() {
+    return accountsService
+        .retrieveAll()
+        .stream()
+        .map(Account::fromEntity)
+        .collect(Collectors.toList());
   }
 }
