@@ -21,6 +21,16 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+
+  maven {
+    url 'http://repo.spring.io/milestone'
+  }
+}
+
+dependencyManagement {
+  imports {
+    mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.M9'
+  }
 }
 
 
@@ -32,8 +42,11 @@ dependencies {
 
 	compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
 	compile group: 'org.flywaydb', name: 'flyway-core', version: '5.1.0'
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '1.4.4.RELEASE'
+  compile 'org.springframework.cloud:spring-cloud-starter-netflix-hystrix'
+
 
   testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.4.1'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '2.18.3'
+
 }

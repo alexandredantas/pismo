@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -22,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
+import com.pismo.transactions.integrations.AccountsService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,15 +43,19 @@ public class TransactionsApplicationTests {
   @Autowired
   private ObjectMapper mapper;
 
+  @Autowired
+  private AccountsService mockAccountsService;
+
   @Before
   public void setup() throws Exception {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    Mockito.reset(mockAccountsService);
   }
 
   @Test
   public void testNewTransaction() throws Exception {
-
     TransactionRequest request = new TransactionRequest(1L, TransactionRequest.OpType.A_VISTA, BigDecimal.ONE);
+    Mockito.when(mockAccountsService.checkExistingAccount(1L)).thenReturn(AccountsService.AccountCheckStates.EXISTS);
 
     mockMvc.perform(post("/v1/transactions")
         .contentType(JSON_TYPE)

@@ -2,7 +2,7 @@ version: '3.6'
 services:
   accounts:
     image: java:8-alpine
-    command: sh -c "apk update && apk add curl && java -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
+    command: sh -c "apk update && apk add curl && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000 -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
     healthcheck:
       test: curl -f http://localhost:8080/actuator/health
       interval: 5s
@@ -18,13 +18,15 @@ services:
     ports:
       - target: 8080
         published: 9090
+      - target: 8000
+        published: 8000
     networks:
       dev:
         aliases:
           - accounts
   transactions:
     image: java:8-alpine
-    command: sh -c "apk update && apk add curl && java -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
+    command: sh -c "apk update && apk add curl && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000 -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
     healthcheck:
       test: curl -f http://localhost:8080/actuator/health
       interval: 5s
@@ -40,6 +42,8 @@ services:
     ports:
       - target: 8080
         published: 9091
+      - target: 8000
+        published: 8001
     networks:
       dev:
         aliases:
