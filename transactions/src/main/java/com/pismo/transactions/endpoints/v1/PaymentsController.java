@@ -22,9 +22,10 @@ public class PaymentsController {
 
   @PostMapping
   public ResponseEntity<?> payDebts(@Validated @RequestBody List<PaymentRequest> payments){
-
-
-    return null;
+    return paymentsService.processPayments(payments)
+        .filter(written -> written > 0)
+        .map(a -> ResponseEntity.ok().build())
+        .orElse(ResponseEntity.status(500).build());
   }
 
 }

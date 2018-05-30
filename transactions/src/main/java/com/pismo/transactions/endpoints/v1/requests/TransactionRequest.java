@@ -10,36 +10,35 @@ import javax.validation.constraints.Min;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pismo.transactions.data.entities.Transactions;
+import com.pismo.transactions.data.entities.Transaction;
 
 public class TransactionRequest {
 
-  public enum OpType{
-    A_VISTA(Transactions.OperationType.COMPRA_A_VISTA),
-    PARCELADA(Transactions.OperationType.COMPRA_PARCELADA),
-    SAQUE(Transactions.OperationType.SAQUE),
-    PAGAMENTO(Transactions.OperationType.PAGAMENTO)
-    ;
+  public enum OpType {
+    A_VISTA(1),
+    PARCELADA(2),
+    SAQUE(3),
+    PAGAMENTO(4);
 
     private static final Map<Integer, OpType> TYPES = Arrays
         .stream(OpType.values())
-        .collect(Collectors.toMap(op -> op.getOperationType().getId(), Function.identity()));
+        .collect(Collectors.toMap(OpType::getOperationType, Function.identity()));
 
-    private final Transactions.OperationType operationType;
+    private final int operationTypeId;
 
 
-    OpType(Transactions.OperationType operationType) {
-      this.operationType = operationType;
+    OpType(int operationType) {
+      this.operationTypeId = operationType;
     }
 
-    public Transactions.OperationType getOperationType() {
-      return operationType;
+    public int getOperationType() {
+      return operationTypeId;
     }
 
     //I'm throwing an exception here to force 400 status code
     @JsonCreator
-    public OpType fromCode(int code){
-      if (!TYPES.containsKey(code)){
+    public OpType fromCode(int code) {
+      if (!TYPES.containsKey(code)) {
         throw new IllegalArgumentException("Invalid operation code");
       }
 
@@ -73,7 +72,7 @@ public class TransactionRequest {
     return amount;
   }
 
-  public Transactions.OperationType getOperationType(){
+  public int getOperationType() {
     return this.operationId.getOperationType();
   }
 }

@@ -6,11 +6,11 @@ import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.pismo.transactions.data.entities.Transactions;
+import com.pismo.transactions.data.entities.Transaction;
 
-public interface TransactionsRepository extends JpaRepository<Transactions, Long> {
+public interface TransactionsRepository extends JpaRepository<Transaction, Long> {
 
-  default Optional<Transactions> saveAndFlushOpt(Transactions entity) {
+  default Optional<Transaction> saveAndFlushOpt(Transaction entity) {
     try{
       return Optional.of(this.saveAndFlush(entity));
     } catch(Exception e){
@@ -18,6 +18,6 @@ public interface TransactionsRepository extends JpaRepository<Transactions, Long
     }
   }
 
-  @Query(value = "select t from Transactions t where t.balance < 0 and t.operationType != 4 and t.accountId = ?1 order by t.operationType, t.eventDate")
-  Stream<Transactions> findExistingDebts(Long accountId);
+  @Query(value = "select t from Transaction t where t.balance < 0 and t.operationType != 4 and t.accountId = ?1 order by t.opType.chargeOrder, t.eventDate")
+  Stream<Transaction> findExistingDebts(Long accountId);
 }

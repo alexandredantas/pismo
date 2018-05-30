@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pismo.transactions.data.entities.Transactions;
+import com.pismo.transactions.data.entities.Transaction;
 import com.pismo.transactions.data.repositories.TransactionsRepository;
 import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
 import com.pismo.transactions.services.AccountsService;
@@ -48,8 +48,8 @@ public class TransactionsController {
   }
 
 
-  private Transactions requestToEntity(TransactionRequest request){
-    Transactions entity = new Transactions();
+  private Transaction requestToEntity(TransactionRequest request){
+    Transaction entity = new Transaction();
     entity.setAccountId(request.getAccountId());
     entity.setAmount(request.getAmount().negate());
     entity.setBalance(request.getAmount().negate());

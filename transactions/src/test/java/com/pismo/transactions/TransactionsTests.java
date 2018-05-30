@@ -1,11 +1,12 @@
 package com.pismo.transactions;
 
+import static com.pismo.transactions.util.TestUtils.JSON_TYPE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,14 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pismo.transactions.data.entities.Transaction;
 import com.pismo.transactions.data.repositories.TransactionsRepository;
 import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
 import com.pismo.transactions.services.AccountsService;
@@ -31,10 +33,6 @@ import com.pismo.transactions.services.AccountsService;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL)
 public class TransactionsTests {
-
-  private MediaType JSON_TYPE = new MediaType(MediaType.APPLICATION_JSON.getType(),
-      MediaType.APPLICATION_JSON.getSubtype(),
-      Charset.forName("utf8"));
 
   private MockMvc mockMvc;
 
@@ -58,6 +56,7 @@ public class TransactionsTests {
   }
 
   @Test
+  @Transactional
   public void postValidTransaction() throws Exception {
     TransactionRequest request = new TransactionRequest(1L, TransactionRequest.OpType.A_VISTA, BigDecimal.ONE);
     Mockito.when(mockAccountsService.checkExistingAccount(1L)).thenReturn(AccountsService.AccountCheckStates.EXISTS);
@@ -66,6 +65,11 @@ public class TransactionsTests {
         .contentType(JSON_TYPE)
         .content(mapper.writeValueAsString(request)))
         .andExpect(status().isOk());
+
+    Transaction recentTransaction = transactionsRepository.findExistingDebts(1L).findFirst().get();
+
+    Assert.assertEquals(recentTransaction.getOperationType(), 1);
+    Assert.assertEquals(recentTransaction.getAmount(), BigDecimal.ONE.negate());
   }
 
   @Test

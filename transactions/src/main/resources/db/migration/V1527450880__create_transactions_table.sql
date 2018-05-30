@@ -9,6 +9,6 @@ CREATE TABLE transactions.transactions
     due_date timestamp with time zone NOT NULL
 );
 
-CREATE INDEX transactions_debt_order_index ON transactions.transactions (operation_type, event_date);
+CREATE INDEX transactions_debt_order_index ON transactions.transactions (event_date);
 
 CREATE INDEX transactions_debt_balance_index ON transactions.transactions (balance);

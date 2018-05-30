@@ -2,16 +2,14 @@ package com.pismo.transactions.data.entities;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
@@ -20,9 +18,9 @@ import org.apache.commons.lang3.tuple.Pair;
 
 @Entity
 @Table(name = "transactions", schema = "transactions")
-public class Transactions {
+public class Transaction {
 
-  public class PaidRecord{
+  public class PaidRecord {
     private final Long transactionId;
     private final BigDecimal amount;
 
@@ -37,39 +35,6 @@ public class Transactions {
 
     public BigDecimal getAmount() {
       return amount;
-    }
-  }
-
-  public enum OperationType{
-    DESCONHECIDO(-1, -1),
-    COMPRA_A_VISTA(1, 2),
-    COMPRA_PARCELADA(2,1),
-    SAQUE(3,0),
-    PAGAMENTO(4,0)
-    ;
-
-    private static final Map<Integer, OperationType> TYPES = Arrays
-        .stream(OperationType.values())
-        .collect(Collectors.toMap(OperationType::getId, Function.identity()));
-
-    private int id;
-    private int chargeOrder;
-
-    OperationType(int id, int chargeOrder) {
-      this.id = id;
-      this.chargeOrder = chargeOrder;
-    }
-
-    public int getId() {
-      return id;
-    }
-
-    public int getChargeOrder() {
-      return chargeOrder;
-    }
-
-    public static OperationType byId(int id){
-      return TYPES.getOrDefault(id, DESCONHECIDO);
     }
   }
 
@@ -91,7 +56,6 @@ public class Transactions {
 
   @NotNull
   @Column(name = "balance")
-  @Max(value = 0)
   private BigDecimal balance;
 
   @NotNull
@@ -101,6 +65,10 @@ public class Transactions {
   @NotNull
   @Column(name = "due_date")
   private LocalDateTime dueDate;
+
+  @OneToOne
+  @JoinColumn(name = "operation_type", insertable = false, updatable = false)
+  private OperationType opType;
 
   public Long getId() {
     return id;
@@ -150,27 +118,28 @@ public class Transactions {
     this.dueDate = dueDate;
   }
 
-  public OperationType getOperationType(){
-    return OperationType.byId(this.operationType);
+  public void setOperationType(int type) {
+    this.operationType = type;
   }
 
-  public void setOperationType(OperationType type){
-    this.operationType = type.id;
+  public int getOperationType() {
+    return operationType;
   }
 
-  public Pair<BigDecimal, PaidRecord> addToBalance(BigDecimal value){
-    if (value.doubleValue() < 0){
+  public Pair<BigDecimal, PaidRecord> addToBalance(BigDecimal value) {
+    if (value.doubleValue() < 0) {
       throw new IllegalArgumentException("Pass a positive value!");
     }
 
     BigDecimal settle = this.balance.add(value);
 
-    if (settle.doubleValue() > 0){
+    if (settle.doubleValue() > 0) {
       PaidRecord record = new PaidRecord(this.id, this.balance.negate());
       this.balance = BigDecimal.ZERO;
       return Pair.of(settle, record);
-    } else{
+    } else {
       PaidRecord record = new PaidRecord(this.id, value.plus());
+      this.balance = this.balance.add(value);
       return Pair.of(BigDecimal.ZERO, record);
     }
   }
