@@ -13,3 +13,12 @@ This command will bootstrap a swarm master node, build services and start them. 
 Accounts -> http://localhost:9000
 
 Transactions -> http://localhost:9001
+
+
+## Stopping
+
+On cloned directory, execute:
+
+`cmd/stop.sh` (linux only)
+
+It will only force removing any service on stack
