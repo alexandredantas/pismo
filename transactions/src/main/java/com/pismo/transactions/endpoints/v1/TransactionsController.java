@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +28,7 @@ public class TransactionsController {
   private TransactionsRepository transactionsRepository;
 
   @PostMapping
-  public ResponseEntity<?> newTransaction(@RequestBody TransactionRequest request){
+  public ResponseEntity<?> newTransaction(@Validated @RequestBody TransactionRequest request){
     return Optional.of(accountsService.checkExistingAccount(request.getAccountId()))
         .filter(state -> !AccountsServiceImpl.AccountCheckStates.NOTEXISTS.equals(state))
         .map(a -> requestToEntity(request))

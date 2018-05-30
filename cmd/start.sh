@@ -40,7 +40,7 @@ echo "Starting environment"
 while [ $SERVICESUP -lt 2 ]
 do
     echo -n "."
-    SERVICESUP=$(docker ps | grep healthy | grep pismo | wc -l)
+    SERVICESUP=$(docker ps | grep -w "healthy" | grep pismo | wc -l)
 done
 
 printf "\n${GREEN}Dev up"

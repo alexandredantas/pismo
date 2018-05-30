@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pismo.transactions.data.repositories.TransactionsRepository;
 import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
 import com.pismo.transactions.integrations.AccountsService;
 
@@ -46,14 +47,18 @@ public class TransactionsApplicationTests {
   @Autowired
   private AccountsService mockAccountsService;
 
+  @Autowired
+  private TransactionsRepository transactionsRepository;
+
   @Before
   public void setup() throws Exception {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    transactionsRepository.deleteAllInBatch();
     Mockito.reset(mockAccountsService);
   }
 
   @Test
-  public void testNewTransaction() throws Exception {
+  public void postValidTransaction() throws Exception {
     TransactionRequest request = new TransactionRequest(1L, TransactionRequest.OpType.A_VISTA, BigDecimal.ONE);
     Mockito.when(mockAccountsService.checkExistingAccount(1L)).thenReturn(AccountsService.AccountCheckStates.EXISTS);
 
@@ -61,5 +66,27 @@ public class TransactionsApplicationTests {
         .contentType(JSON_TYPE)
         .content(mapper.writeValueAsString(request)))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  public void postInvalidTransaction() throws Exception {
+    TransactionRequest request = new TransactionRequest(1L, TransactionRequest.OpType.A_VISTA, BigDecimal.valueOf(-1));
+    Mockito.when(mockAccountsService.checkExistingAccount(1L)).thenReturn(AccountsService.AccountCheckStates.EXISTS);
+
+    mockMvc.perform(post("/v1/transactions")
+        .contentType(JSON_TYPE)
+        .content(mapper.writeValueAsString(request)))
+        .andExpect(status().is(400));
+  }
+
+  @Test
+  public void postTransactionForMissingAccount() throws Exception {
+    TransactionRequest request = new TransactionRequest(1L, TransactionRequest.OpType.A_VISTA, BigDecimal.TEN);
+    Mockito.when(mockAccountsService.checkExistingAccount(1L)).thenReturn(AccountsService.AccountCheckStates.NOTEXISTS);
+
+    mockMvc.perform(post("/v1/transactions")
+        .contentType(JSON_TYPE)
+        .content(mapper.writeValueAsString(request)))
+        .andExpect(status().is(400));
   }
 }

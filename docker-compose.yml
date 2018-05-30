@@ -2,12 +2,12 @@ version: '3.6'
 services:
   accounts:
     image: java:8-alpine
-    command: sh -c "apk update && apk add curl && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000 -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
+    command: sh -c "apk update && apk add curl && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
     healthcheck:
       test: curl -f http://localhost:8080/actuator/health
       interval: 5s
       timeout: 2s
-      retries: 5
+      retries: 15
       start_period: 10s
     depends_on:
       - database
@@ -26,12 +26,12 @@ services:
           - accounts
   transactions:
     image: java:8-alpine
-    command: sh -c "apk update && apk add curl && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=8000 -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
+    command: sh -c "apk update && apk add curl && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 -Dspring.profiles.active=dev -jar `ls /var/service/*.jar`"
     healthcheck:
       test: curl -f http://localhost:8080/actuator/health
       interval: 5s
       timeout: 2s
-      retries: 5
+      retries: 15
       start_period: 10s
     depends_on:
       - database
