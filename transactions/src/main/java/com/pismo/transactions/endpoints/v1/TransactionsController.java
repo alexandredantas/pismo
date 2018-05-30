@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pismo.transactions.data.entities.Transactions;
 import com.pismo.transactions.data.repositories.TransactionsRepository;
 import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
-import com.pismo.transactions.integrations.AccountsService;
-import com.pismo.transactions.integrations.impl.AccountsServiceImpl;
+import com.pismo.transactions.services.AccountsService;
+import com.pismo.transactions.services.impl.AccountsServiceImpl;
 
 @RestController
 @RequestMapping(path = "/v1/transactions")

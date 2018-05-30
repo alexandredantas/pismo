@@ -24,13 +24,13 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pismo.transactions.data.repositories.TransactionsRepository;
 import com.pismo.transactions.endpoints.v1.requests.TransactionRequest;
-import com.pismo.transactions.integrations.AccountsService;
+import com.pismo.transactions.services.AccountsService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQL)
-public class TransactionsApplicationTests {
+public class TransactionsTests {
 
   private MediaType JSON_TYPE = new MediaType(MediaType.APPLICATION_JSON.getType(),
       MediaType.APPLICATION_JSON.getSubtype(),

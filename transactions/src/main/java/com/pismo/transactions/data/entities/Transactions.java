@@ -13,11 +13,32 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 @Entity
 @Table(name = "transactions", schema = "transactions")
 public class Transactions {
+
+  public class PaidRecord{
+    private final Long transactionId;
+    private final BigDecimal amount;
+
+    public PaidRecord(Long transactionId, BigDecimal amount) {
+      this.transactionId = transactionId;
+      this.amount = amount;
+    }
+
+    public Long getTransactionId() {
+      return transactionId;
+    }
+
+    public BigDecimal getAmount() {
+      return amount;
+    }
+  }
 
   public enum OperationType{
     DESCONHECIDO(-1, -1),
@@ -70,6 +91,7 @@ public class Transactions {
 
   @NotNull
   @Column(name = "balance")
+  @Max(value = 0)
   private BigDecimal balance;
 
   @NotNull
@@ -134,5 +156,22 @@ public class Transactions {
 
   public void setOperationType(OperationType type){
     this.operationType = type.id;
+  }
+
+  public Pair<BigDecimal, PaidRecord> addToBalance(BigDecimal value){
+    if (value.doubleValue() < 0){
+      throw new IllegalArgumentException("Pass a positive value!");
+    }
+
+    BigDecimal settle = this.balance.add(value);
+
+    if (settle.doubleValue() > 0){
+      PaidRecord record = new PaidRecord(this.id, this.balance.negate());
+      this.balance = BigDecimal.ZERO;
+      return Pair.of(settle, record);
+    } else{
+      PaidRecord record = new PaidRecord(this.id, value.plus());
+      return Pair.of(BigDecimal.ZERO, record);
+    }
   }
 }

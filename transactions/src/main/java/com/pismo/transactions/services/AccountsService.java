@@ -1,4 +1,4 @@
-package com.pismo.transactions.integrations;
+package com.pismo.transactions.services;
 
 public interface AccountsService {
 

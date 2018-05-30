@@ -1,4 +1,4 @@
-package com.pismo.transactions.integrations.impl;
+package com.pismo.transactions.services.impl;
 
 import javax.annotation.PostConstruct;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
-import com.pismo.transactions.integrations.AccountsService;
+import com.pismo.transactions.services.AccountsService;
 
 @Service
 @Profile("!test")

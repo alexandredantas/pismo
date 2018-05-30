@@ -10,3 +10,5 @@ CREATE TABLE transactions.transactions
 );
 
 CREATE INDEX transactions_debt_order_index ON transactions.transactions (operation_type, event_date);
+
+CREATE INDEX transactions_debt_balance_index ON transactions.transactions (balance);
