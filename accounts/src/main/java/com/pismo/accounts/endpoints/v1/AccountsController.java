@@ -6,11 +6,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pismo.accounts.endpoints.v1.dto.Account;
@@ -25,8 +27,7 @@ public class AccountsController {
   @Autowired
   private AccountsService accountsService;
 
-  @RequestMapping(method = RequestMethod.POST)
-  @ResponseBody
+  @PostMapping
   public AccountCreateResponse createAccount() {
     return accountsService
         .create()
@@ -34,8 +35,7 @@ public class AccountsController {
         .orElseGet(AccountCreateResponse::empty);
   }
 
-  @RequestMapping(path = "/{accountId}", method = RequestMethod.PATCH)
-  @ResponseBody
+  @PatchMapping(path = "/{accountId}")
   public ChangeLimitResponse changeLimits(@PathVariable("accountId") Long accountId, @RequestBody Account changeLimit) {
     return accountsService
         .findById(accountId)
@@ -47,16 +47,22 @@ public class AccountsController {
         .orElseGet(ChangeLimitResponse::empty);
   }
 
-  @RequestMapping(path = "/{accountId}/limits", method = RequestMethod.GET)
-  @ResponseBody
+  @GetMapping(path = "/{accountId}/limits")
   public Optional<Account> accountLimits(@PathVariable("accountId") Long accountId) {
     return accountsService
         .findById(accountId)
         .map(Account::fromEntity);
   }
 
-  @RequestMapping(path = "/limits", method = RequestMethod.GET)
-  @ResponseBody
+  @GetMapping(path = "/{accountId}")
+  public ResponseEntity<?> existingAccount(@PathVariable("accountId") Long accountId) {
+    return accountsService
+        .findById(accountId)
+        .map(a -> ResponseEntity.ok().build())
+        .orElse(ResponseEntity.notFound().build());
+  }
+
+  @GetMapping(path = "/limits")
   public List<Account> allLimits() {
     return accountsService
         .retrieveAll()

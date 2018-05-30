@@ -131,4 +131,20 @@ public class AccountsTests {
         .andExpect(jsonPath("$.new_limits.available_withdrawal_limit.amount", is(10.1)));
   }
 
+  @Test
+  public void testExistingAcocunt() throws Exception{
+    Account newAccount = accountsRepository.save(Account.empty());
+
+    mockMvc
+        .perform(get(String.format("/v1/accounts/%d", newAccount.getId())))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  public void testNonExistingAcocunt() throws Exception{
+    mockMvc
+        .perform(get("/v1/accounts/10"))
+        .andExpect(status().is(404));
+  }
+
 }
